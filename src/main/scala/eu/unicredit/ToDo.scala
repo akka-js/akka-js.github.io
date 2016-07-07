@@ -5,6 +5,7 @@ import akka.actor.{Props, PoisonPill}
 import scala.scalajs.js
 
 import org.scalajs.dom.document.{getElementById => getElem}
+import org.scalajs.dom.window.alert
 
 import scalatags.JsDom._
 import scalatags.JsDom.all._
@@ -50,7 +51,7 @@ case class ToDoList(maxLi: Int) extends DomActor {
   override def operative = domManagement orElse {
     case value: String =>
       if (context.children.size >= maxLi)
-        js.Dynamic.global.alert("list limit reached")
+         alert("list limit reached.")
       else
         context.actorOf(Props(ToDoElem(value)))
   }
