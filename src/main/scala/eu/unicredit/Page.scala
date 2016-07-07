@@ -226,7 +226,7 @@ case class ToDoPanel(col_style: String) extends
   def content =
     div(
       p(cls := "alert alert-info")(
-        "Here we see a possible integration of the Actor model with the Dom. Actors life cycle is mapped on the rendering of Dom Nodes."
+        "Here we see a possible integration of the Actor model with the Dom. Actors life cycle is mapped on the rendering of a related template."
       ),
       div(id := todoId, cls := "container")
     )

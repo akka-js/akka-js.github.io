@@ -21,7 +21,7 @@ case class ToDo(hook: String) extends DomActor {
             }
           }).render
 
-  val listActor = context.actorOf(Props(ToDoList()))
+  val listActor = context.actorOf(Props(ToDoList(10)))
 
   val addElem: () => Unit = () => listActor ! inputBox.value
 
@@ -43,13 +43,16 @@ case class ToDo(hook: String) extends DomActor {
     )
 }
 
-case class ToDoList() extends DomActor {
+case class ToDoList(maxLi: Int) extends DomActor {
 
   def template() = ul(cls := "container")
 
   override def operative = domManagement orElse {
     case value: String =>
-      context.actorOf(Props(ToDoElem(value)))
+      if (context.children.size >= maxLi)
+        js.Dynamic.global.alert("list limit reached")
+      else
+        context.actorOf(Props(ToDoElem(value)))
   }
 }
 
