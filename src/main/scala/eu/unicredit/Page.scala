@@ -141,7 +141,9 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
 
       getElem(s"code$modalId").innerHTML =
         js.Dynamic.global.hljs.highlight("scala", source).value.toString
-    })
+    }).recover{
+      case _ => getElem(s"code$modalId").innerHTML("source not found")
+    }
   }
 
 }
