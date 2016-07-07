@@ -18,7 +18,7 @@ class Stream {
 
   def start(ref: ActorRef) = {
     val systemName = s"stream${randomUUID}"
-    system = ActorSystem(systemName, AkkaConfig.actorLoggingConf)
+    system = ActorSystem(systemName, AkkaConfig.actorStreamLoggingConf)
 
     implicit val actorSystem = system
     implicit val dispatcher = system.dispatcher
@@ -31,17 +31,15 @@ class Stream {
     val throttledAndZipped = Flow[String]
       .zip(factorial).map{case (index, fact) => s"factorial(${index}) = ${fact}"}
       .throttle(1, 1 second, 1, ThrottleMode.shaping)
-      .mapAsync(10)(a =>
-        Future{s"async -> $a"}
-      )
+      .mapAsync(10)(a => Future{s"async -> $a"})
 
     val flow =
       throttledAndZipped.
-        to(Sink.foreach{
+      to(Sink.foreach{
           ea: String => system.log.info(s"sink: ${ea}")
-        })
+      })
 
-    system.scheduler.scheduleOnce(200 millis){
+    system.scheduler.scheduleOnce(100 millis){
       ActorLogger.lastLogger.map(_ ! SetTargetActor(ref))
 
       flow.runWith(strings)

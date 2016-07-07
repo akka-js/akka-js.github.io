@@ -20,7 +20,8 @@ object Page extends js.JSApp {
     val panels = List(
       {s: String => Props(PingPongPanel(s))},
       {s: String => Props(ToDoPanel(s))},
-      {s: String => Props(StreamPanel(s))}
+      {s: String => Props(StreamPanel(s))},
+      {s: String => Props(ThisPagePanel(s))}
     )
 
     import system.dispatcher
@@ -264,7 +265,7 @@ case class StreamPanel(col_style: String) extends
 
   override def operative = {
     loadSource()
-    running(new Stream, context.actorOf(Props(LogActor(loggerId, 20, 20, List()))))
+    running(new Stream, context.actorOf(Props(LogActor(loggerId, 15, 20, List()))))
   }
 
   def running(stream: Stream, logger: ActorRef): Receive = domManagement orElse {
@@ -274,5 +275,25 @@ case class StreamPanel(col_style: String) extends
       logger ! ResetLog
     case Stop =>
       stream.stop()
+  }
+}
+
+case class ThisPagePanel(col_style: String) extends
+    Panel(
+      "This Page",
+      "Page.scala",
+      col_style
+    ) {
+
+  def content =
+    div(
+      p(cls := "alert alert-info")(
+        "This page itself is an example of how Akka can help you developing truly reactive frontends!"
+      )
+    )
+
+  override def operative = {
+    loadSource()
+    super.operative
   }
 }

@@ -4,29 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 object AkkaConfig {
 
-
-  //TODO cleanup
-  def base(logger: String) = s"""
-akka {
-  home = ""
-  version = "2.4-SNAPSHOT"
-  time-unit = "seconds"
-  loggers = ["$logger"]
-  logging-filter = "akka.event.JSDefaultLoggingFilter"
-  #logging-filter = "akka.event.DefaultLoggingFilter"
-  loggers-dispatcher = "akka.actor.default-dispatcher"
-  logger-startup-timeout = 5s
-  loglevel = "DEBUG"
-  stdout-loglevel = "DEBUG"
-  log-config-on-start = off
-  log-dead-letters = 0
-  log-dead-letters-during-shutdown = off
-  library-extensions = []
-  extensions = []
-  daemonic = off
-  jvm-exit-on-fatal-error = on
-
-
+  val stream = """
   stream {
 
     # Default flow materializer settings
@@ -114,7 +92,30 @@ akka {
       }
     }
   }
+  """
 
+  //TODO cleanup
+  def base(logger: String, stream: String = "") = s"""
+akka {
+  home = ""
+  version = "2.4-SNAPSHOT"
+  time-unit = "seconds"
+  loggers = ["$logger"]
+  logging-filter = "akka.event.JSDefaultLoggingFilter"
+  #logging-filter = "akka.event.DefaultLoggingFilter"
+  loggers-dispatcher = "akka.actor.default-dispatcher"
+  logger-startup-timeout = 5s
+  loglevel = "DEBUG"
+  stdout-loglevel = "DEBUG"
+  log-config-on-start = off
+  log-dead-letters = 0
+  log-dead-letters-during-shutdown = off
+  library-extensions = []
+  extensions = []
+  daemonic = off
+  jvm-exit-on-fatal-error = on
+
+  $stream
 
   actor {
     #provider = "akka.actor.LocalActorRefProvider"
@@ -309,6 +310,8 @@ akka {
 
   val actorLogging = base("eu.unicredit.ActorLogger")
 
+  val actorStreamLogging = base("eu.unicredit.ActorLogger", stream)
+
   import com.typesafe.config.{ Config, ConfigFactory }
 
   val config: Config = ConfigFactory.parseString(default)
@@ -317,6 +320,12 @@ akka {
     ActorLogger.loadLoggerClass()
 
     ConfigFactory.parseString(actorLogging)
+  }
+
+  val actorStreamLoggingConf: Config = {
+    ActorLogger.loadLoggerClass()
+
+    ConfigFactory.parseString(actorStreamLogging)
   }
 
 }
