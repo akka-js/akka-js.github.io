@@ -30,7 +30,7 @@ class Stream {
 
     val throttledAndZipped = Flow[String]
       .zip(factorial).map{case (index, fact) => s"factorial(${index}) = ${fact}"}
-      .throttle(1, 1 second, 1, ThrottleMode.shaping)
+      .throttle(1, 500 millis, 1, ThrottleMode.shaping)
       .mapAsync(10)(a => Future{s"async -> $a"})
 
     val flow =

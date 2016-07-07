@@ -36,15 +36,17 @@ case class BodyActor(panels: List[(String) => Props]) extends DomActor {
   override val domElement = Some(getElem("body"))
 
   def template() =
-    body(cls := "container")(
-      div(id := "overlay")()
+    body(cls := "container", style := "overflow-x:hidden")(
+      div(id := "overlay")
     )
 
   override def operative = {
     val evens = panels.zipWithIndex.filter{case (_, i) => i % 2 == 0}
     val odds = panels.zipWithIndex.filter{case (_, i) => i % 2 != 0}
 
-    val logo = context.actorOf(Props(LogoActor()))
+    context.actorOf(Props(LogoActor()))
+
+    context.actorOf(Props(Note()))
 
     evens.map{case (o, _) => Some(o)}.zipAll(
       odds.map{case (o, _) => Some(o)}, None, None
@@ -52,8 +54,38 @@ case class BodyActor(panels: List[(String) => Props]) extends DomActor {
       context.actorOf(Props(RowActor(x._1, x._2)))
     )
 
+    context.actorOf(Props(Footer()))
+
     super.operative
   }
+}
+
+case class Note() extends DomActor {
+  def template() =
+    div(cls := "row")(
+      div(cls := "col-md-12")(
+        p(cls := "alert alert-success")(
+          "The complete source code of this page is available ",
+          a(href := "https://github.com/andreaTP/akka.js-site")(" here"),
+          "."
+        )
+      )
+    )
+}
+
+case class Footer() extends DomActor {
+  def template() =
+    footer(cls := "footer")(
+      div(cls := "container")(
+        p(cls := "text-muted")(
+          "Inspiration for this page and much of the styles comes from ",
+          a(href := "http://andreaferretti.github.io/paths-js-react-demo/")("Paths demo"),
+          " many thanks to ",
+          a(href := "https://github.com/andreaferretti")("@andreaferretti"),
+          "."
+        )
+      )
+    )
 }
 
 case class LogoActor() extends DomActor {
@@ -265,7 +297,7 @@ case class StreamPanel(col_style: String) extends
 
   override def operative = {
     loadSource()
-    running(new Stream, context.actorOf(Props(LogActor(loggerId, 15, 20, List()))))
+    running(new Stream, context.actorOf(Props(LogActor(loggerId, 20, 20, List()))))
   }
 
   def running(stream: Stream, logger: ActorRef): Receive = domManagement orElse {
