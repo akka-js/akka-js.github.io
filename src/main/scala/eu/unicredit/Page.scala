@@ -18,8 +18,8 @@ object Page extends js.JSApp {
     val system = ActorSystem("akkasite", AkkaConfig.config)
 
     val panels = List(
-      {s: String => Props(PingPongPanel(s))}/*,
-      {s: String => Props(PingPongPanel(s))}*/
+      {s: String => Props(PingPongPanel(s))},
+      {s: String => Props(ToDoPanel(s))}
     )
 
     import system.dispatcher
@@ -210,4 +210,30 @@ case class LogActor(hook: String, showLines: Int, maxLines: Int) extends DomActo
       context.become(withText(newTxt))
   }
 
+}
+
+case class ToDoPanel(col_style: String) extends
+    Panel(
+      "To Do",
+      "ToDo.scala",
+      col_style
+    ) {
+
+  val todoId = randomUUID.toString
+
+  def content =
+    div(
+      p(cls := "alert alert-info")(
+        "Here we see a possible integration of the Actor model with the Dom. Actors life cycle is mapped on the rendering of Dom Nodes."
+      ),
+      div(id := todoId)
+    )
+
+  override def operative = {
+    loadSource()
+
+    context.actorOf(Props(ToDo(todoId)))
+
+    super.operative
+  }
 }
