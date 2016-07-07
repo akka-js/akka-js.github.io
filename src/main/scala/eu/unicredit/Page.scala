@@ -19,7 +19,8 @@ object Page extends js.JSApp {
 
     val panels = List(
       {s: String => Props(PingPongPanel(s))},
-      {s: String => Props(ToDoPanel(s))}
+      {s: String => Props(ToDoPanel(s))},
+      {s: String => Props(StreamPanel(s))}
     )
 
     import system.dispatcher
@@ -131,7 +132,6 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
 
   def loadSource() = {
     import context.dispatcher
-    println("calling \n "+s"$prefix_url$source_url")
     Ajax.get(s"$prefix_url$source_url",
       timeout = 3000
     ).map(req => {
@@ -265,7 +265,7 @@ case class StreamPanel(col_style: String) extends
 
   override def operative = {
     loadSource()
-    running(new Stream, context.actorOf(Props(LogActor(loggerId, 10, 100))))
+    running(new Stream, context.actorOf(Props(LogActor(loggerId, 10, 10))))
   }
 
   def running(stream: Stream, logger: ActorRef): Receive = domManagement orElse {

@@ -18,15 +18,13 @@ class Stream {
 
   def start(ref: ActorRef) = {
     val systemName = s"stream${randomUUID}"
-    system = ActorSystem(systemName, AkkaConfig.actorLoggingConf)
+    system = ActorSystem(systemName, AkkaConfig.config/*actorLoggingConf*/)
 
     implicit val actorSystem = system
     implicit val dispatcher = system.dispatcher
     implicit val materializer = ActorMaterializer()
 
     val factorial = Source(1 to 10).scan(1)(_ * _)
-
-    implicit val timeout = Timeout(5 seconds)
 
     val strings =  Source(1 to 10).map(_.toString)
 
@@ -44,7 +42,7 @@ class Stream {
         })
 
     system.scheduler.scheduleOnce(100 millis){
-      ActorLogger.lastLogger.map(_ ! SetTargetActor(ref))
+      //ActorLogger.lastLogger.map(_ ! SetTargetActor(ref))
 
       flow.runWith(strings)
     }

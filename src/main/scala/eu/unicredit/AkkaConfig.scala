@@ -208,6 +208,49 @@ akka {
     implementation = akka.actor.EventLoopScheduler
     shutdown-timeout = 5s
   }
+
+stream {
+    materializer {
+
+      initial-input-buffer-size = 4
+      max-input-buffer-size = 16
+
+      dispatcher = ""
+
+      subscription-timeout {
+        mode = cancel
+
+        timeout = 5s
+      }
+
+      debug-logging = on
+
+      output-burst-limit = 1000
+
+      auto-fusing = on
+
+      max-fixed-buffer-size = 1000000000
+
+      sync-processing-limit = 1000
+
+      debug {
+        fuzzing-mode = off
+      }
+    }
+    blocking-io-dispatcher = "akka.stream.default-blocking-io-dispatcher"
+
+    default-blocking-io-dispatcher {
+      type = "Dispatcher"
+      executor = "thread-pool-executor"
+      throughput = 1
+
+      thread-pool-executor {
+        core-pool-size-min = 2
+        core-pool-size-factor = 2.0
+        core-pool-size-max = 16
+      }
+    }
+  }
 }
 """
 
