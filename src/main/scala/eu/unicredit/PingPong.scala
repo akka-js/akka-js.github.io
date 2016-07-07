@@ -7,6 +7,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import java.util.UUID.randomUUID
 
+import ActorLogger._
+
 class PingPong {
   var system: ActorSystem = _
 
@@ -15,7 +17,7 @@ class PingPong {
     system = ActorSystem(systemName, AkkaConfig.actorLoggingConf)
 
     def ppActor(matcher: String, answer: String) = Props(
-        new Actor with ActorLogging {
+      new Actor with ActorLogging {
           log.warning(s"Starting $matcher -> $answer")
 
           def receive = {
@@ -30,7 +32,7 @@ class PingPong {
     val pinger = system.actorOf(ppActor("pong", "ping"))
 
     system.scheduler.scheduleOnce(100 millis){
-      ActorLogger.lastLogger.map(_ ! ActorLogger.SetTargetActor(ref))
+      ActorLogger.lastLogger.map(_ ! SetTargetActor(ref))
 
       pinger.!("pong")(ponger)
     }

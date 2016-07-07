@@ -97,7 +97,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
   val prefix_url = "https://api.github.com/repos/andreaTP/akka.js-site/contents/src/main/scala/eu/unicredit/"
 
   val modal =
-    div(id := modalId, cls := "modal fade", "role".attr := "dialog")(
+    div(id := modalId, cls := "modal fade large", "role".attr := "dialog")(
       div(cls := "modal-dialog")(
         div(cls := "modal-content")(
           div(cls := "modal-header")(
