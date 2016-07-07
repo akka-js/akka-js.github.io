@@ -239,3 +239,41 @@ case class ToDoPanel(col_style: String) extends
     super.operative
   }
 }
+
+case class StreamPanel(col_style: String) extends
+    Panel(
+      "Stream",
+      "Stream.scala",
+      col_style
+    ) {
+
+  val loggerId = randomUUID.toString
+
+  def content =
+    div(
+      p(cls := "alert alert-info")(
+        "Here is an Akka-Stream.js basic example, where a factorial flow will run."
+      ),
+      button(`type` :="button", cls :="btn btn-success alert col-md-2", onclick := {() => self ! Start})("Start"),
+      div(cls :="col-md-1"),
+      button(`type` :="button", cls :="btn btn-danger alert col-md-2", onclick := {() => self ! Stop})("Stop"),
+      div(id := loggerId)
+    )
+
+  case object Start
+  case object Stop
+
+  override def operative = {
+    loadSource()
+    running(new Stream, context.actorOf(Props(LogActor(loggerId, 10, 100))))
+  }
+
+  def running(stream: Stream, logger: ActorRef): Receive = domManagement orElse {
+    case Start =>
+      stream.stop()
+      stream.start(logger)
+      logger ! ResetLog
+    case Stop =>
+      stream.stop()
+  }
+}

@@ -3,7 +3,6 @@ package eu.unicredit
 import akka.actor._
 import scala.util.Try
 import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import java.util.UUID.randomUUID
 
@@ -31,6 +30,7 @@ class PingPong {
     val ponger = system.actorOf(ppActor("ping", "pong"))
     val pinger = system.actorOf(ppActor("pong", "ping"))
 
+    implicit val dispatcher = system.dispatcher
     system.scheduler.scheduleOnce(100 millis){
       ActorLogger.lastLogger.map(_ ! SetTargetActor(ref))
 
