@@ -239,7 +239,8 @@ case class LogActor(hook: String, showLines: Int, maxLines: Int, init: List[Stri
       self ! UpdateValue(initValue)
       context.become(withText(initValue))
     case LogMsg(txt) =>
-      val newTxt = (last :+ txt).takeRight(maxLines)
+      val str = new String(txt.toCharArray.filterNot(_.toInt == 0))
+      val newTxt = (last :+ str).takeRight(maxLines)
       self ! UpdateValue(newTxt)
       context.become(withText(newTxt))
   }
