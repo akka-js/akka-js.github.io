@@ -101,7 +101,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
             button(`type` :="button", cls := "close", "aria-hidden".attr :="true", "data-dismiss".attr := "modal")("×")
           ),
           div(cls := "modal-body")(
-            p("Some text")
+            p(s"fetch the source from somthing like $source_url")
           ),
           div(cls := "modal-footer")(
             button(`type` := "button", cls := "close", "aria-hidden".attr :="true", "data-dismiss".attr := "modal")("Close")
@@ -128,7 +128,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
 case class PingPongPanel(col_style: String) extends
     Panel(
       "Ping Pong",
-      "somewhere/PingPong.scala",
+      "https://raw.githubusercontent.com/andreaTP/akka.js-site/master/src/main/scala/eu/unicredit/PingPong.scala",
       col_style
     ) {
 
@@ -149,13 +149,13 @@ case class PingPongPanel(col_style: String) extends
   case object Stop
 
   override def operative = {
-    running(new PingPong, context.actorOf(Props(LogActor(loggerId, 10))))
+    running(new PingPong, context.actorOf(Props(LogActor(loggerId, 10, 100))))
   }
 
   def running(pp: PingPong, logger: ActorRef): Receive = domManagement orElse {
     case Start =>
       pp.stop()
-      pp.start({s: String => logger ! LogMsg(s)})
+      pp.start(logger)
       logger ! ResetLog
     case Stop =>
       pp.stop()
@@ -165,14 +165,14 @@ case class PingPongPanel(col_style: String) extends
 case class LogMsg(txt: String)
 case object ResetLog
 
-case class LogActor(hook: String, maxLines: Int) extends DomActorWithParams[List[String]] {
+case class LogActor(hook: String, showLines: Int, maxLines: Int) extends DomActorWithParams[List[String]] {
   override val domElement = Some(getElem(hook))
 
   val initValue: List[String] =
     (for (_ <- 0 until maxLines) yield "").toList
 
   def template(txt: List[String]) =
-    textarea(cls := "form-control", "rows".attr := s"$maxLines")(
+    textarea(cls := "form-control", "rows".attr := s"$showLines", "readonly".attr := "readonly", style := "style=font-family: monospace;font-size: 70%")(
       txt.mkString("\n")
     )
 

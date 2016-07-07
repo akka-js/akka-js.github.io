@@ -5,18 +5,23 @@ import scala.util.Try
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import java.util.UUID.randomUUID
+
 class PingPong {
   var system: ActorSystem = _
 
-  def start(print: (String) => Unit) = {
-    system = ActorSystem("pingpong", AkkaConfig.config)
+  def start(ref: ActorRef) = {
+    val systemName = s"pingpong${randomUUID.toString.replace("-","")}"
+    system = ActorSystem(systemName, AkkaConfig.actorLoggingConf)
 
     def ppActor(matcher: String, answer: String) = Props(
-        new Actor {
+        new Actor with ActorLogging {
+          log.warning(s"Starting $matcher -> $answer")
+
           def receive = {
             case matcher =>
               sender ! answer
-              print(s"received $matcher sending answer $answer")
+              log.info(s"received $matcher sending answer $answer")
           }
         }
       )
@@ -24,9 +29,14 @@ class PingPong {
     val ponger = system.actorOf(ppActor("ping", "pong"))
     val pinger = system.actorOf(ppActor("pong", "ping"))
 
-    system.scheduler.scheduleOnce(100 millis)(
+    system.scheduler.scheduleOnce(100 millis){
+      ActorLogger.lastLogger.map{x =>
+        println("last logger is "+x.path)
+        x ! ActorLogger.SetTargetActor(ref)
+      }
+
       pinger.!("pong")(ponger)
-    )
+    }
   }
 
   def stop() = {

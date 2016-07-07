@@ -4,14 +4,11 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 object AkkaConfig {
 
-  val default = """
+  def base(logger: String) = s"""
 akka {
   home = ""
   version = "2.4-SNAPSHOT"
-  #loggers = ["akka.event.Logging$DefaultLogger"]
-  loggers = ["akka.event.JSDefaultLogger"]
-  #loggers = ["akka.event.DefaultLogger"]
-  #loggers = ["akka.event.LoggingBusActor"]
+  loggers = ["$logger"]
   logging-filter = "akka.event.JSDefaultLoggingFilter"
   #logging-filter = "akka.event.DefaultLoggingFilter"
   loggers-dispatcher = "akka.actor.default-dispatcher"
@@ -197,7 +194,7 @@ akka {
     warn-about-java-serializer-usage = on
     serialization-identifiers {
       "akka.serialization.JavaSerializer" = 1
-      "akka.serialization.ByteArraySerializer" = 4  
+      "akka.serialization.ByteArraySerializer" = 4
     }
     dsl {
       inbox-size = 1000
@@ -214,8 +211,18 @@ akka {
 }
 """
 
+  val default = base("akka.event.JSDefaultLogger")
+
+  val actorLogging = base("eu.unicredit.ActorLogger")
+
   import com.typesafe.config.{ Config, ConfigFactory }
 
   val config: Config = ConfigFactory.parseString(default)
+
+  val actorLoggingConf: Config = {
+    ActorLogger.loadLoggerClass()
+
+    ConfigFactory.parseString(actorLogging)
+  }
 
 }
