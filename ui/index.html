@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+    <!--<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">-->
     <link rel="stylesheet" type="text/css" href="highlight/styles/monokai.css">
     <link rel="stylesheet" href="css/main.css">
 
@@ -23,5 +23,14 @@
     hljs.configure({
       tabReplace: '  '
     })
+
+    $(document).ready(function() {
+      $('form input').keydown(function(event){
+        if(event.keyCode == 13) {
+          event.preventDefault();
+          return false;
+        }
+      });
+    });
     </script>
 </html>

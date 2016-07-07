@@ -101,7 +101,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
       div(cls := "modal-dialog")(
         div(cls := "modal-content")(
           div(cls := "modal-header")(
-            h4(cls := "modal-title")(s"$title source")
+            h4(cls := "modal-title")(s"$title source code:")
           ),
           div(cls := "modal-body")(
             pre(style := "background-color: black")(
@@ -133,7 +133,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
     import context.dispatcher
     println("calling \n "+s"$prefix_url$source_url")
     Ajax.get(s"$prefix_url$source_url",
-      timeout = 2000
+      timeout = 3000
     ).map(req => {
       val json = js.JSON.parse(req.responseText)
 
@@ -142,7 +142,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
       getElem(s"code$modalId").innerHTML =
         js.Dynamic.global.hljs.highlight("scala", source).value.toString
     }).recover{
-      case _ => getElem(s"code$modalId").innerHTML("source not found")
+      case _ => getElem(s"code$modalId").innerHTML = "source not found"
     }
   }
 
@@ -228,7 +228,7 @@ case class ToDoPanel(col_style: String) extends
       p(cls := "alert alert-info")(
         "Here we see a possible integration of the Actor model with the Dom. Actors life cycle is mapped on the rendering of Dom Nodes."
       ),
-      div(id := todoId)
+      div(id := todoId, cls := "container")
     )
 
   override def operative = {
