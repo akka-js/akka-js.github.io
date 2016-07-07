@@ -15,6 +15,8 @@ case class ToDo(hook: String) extends DomActor {
 
   val inputBox =
     input("placeholder".attr := "what to do?",
+          `type` := "text",
+          cls := "form-control",
           onkeydown := {(event: js.Dynamic) =>
             if(event.keyCode == 13) {
               event.preventDefault()
@@ -28,14 +30,12 @@ case class ToDo(hook: String) extends DomActor {
 
   def template() =
     div(
-      form(cls := "form-inline",
-          "role".attr := "form",
-          style := "margin:0 auto;width:50%")(
-        div(cls := "form-group")(
-          inputBox,
+      div(cls := "input-group")(
+        inputBox,
+        span(cls := "input-group-btn")(
           button(
             `type` := "button",
-            cls := "btn btn-default btn-sm",
+            cls := "btn btn-default",
             onclick := addElem
           )("Add")
         )
@@ -46,7 +46,7 @@ case class ToDo(hook: String) extends DomActor {
 
 case class ToDoList(maxLi: Int) extends DomActor {
 
-  def template() = ul(cls := "container")
+  def template() = div()
 
   override def operative = domManagement orElse {
     case value: String =>
@@ -60,11 +60,18 @@ case class ToDoList(maxLi: Int) extends DomActor {
 case class ToDoElem(value: String) extends DomActor {
 
   def template() =
-    li(style := "margin:0 auto;width:85%")(
-      form(cls := "form-inline", "role".attr := "form")(
-        div(cls := "form-group")(
-            label(style := "margin-right:50px")(value),
-            a(onclick := {() => self ! PoisonPill})("Remove")
+    div(cls := "row")(
+      div(cls := "col-md-1"),
+      div(cls := "col-md-8")(
+        p(
+          span(cls := "glyphicon glyphicon-chevron-right"),
+          s" $value"
+        )
+      ),
+      div(cls := "col-md-3")(
+        span(cls := "glyphicon glyphicon-remove",
+             style := "cursor:pointer",
+             onclick := {() => self ! PoisonPill}
         )
       )
     )

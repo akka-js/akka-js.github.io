@@ -36,7 +36,7 @@ case class BodyActor(panels: List[(String) => Props]) extends DomActor {
   override val domElement = Some(getElem("body"))
 
   def template() =
-    body(cls := "container", style := "overflow-x:hidden")(
+    body(cls := "container"/*, style := "overflow-x:hidden"*/)(
       div(id := "overlay")
     )
 
@@ -153,9 +153,10 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
     div(cls := col_style)(
       div(cls := "panel panel-default")(
         div(cls := "panel-heading")(
-          h2(cls := "panel-title")(title),
-          span(cls := "links")(
-            a("data-toggle".attr :="modal", "data-target".attr :=s"#$modalId")("Source")
+          h2(cls := "panel-title")(title,
+            span(cls := "links pull-right", style := "cursor:pointer")(
+              a("data-toggle".attr :="modal", "data-target".attr :=s"#$modalId")("Source")
+            )
           )
         ),
         modal,
