@@ -11,7 +11,7 @@ class PingPong {
   var system: ActorSystem = _
 
   def start(ref: ActorRef) = {
-    val systemName = s"pingpong${randomUUID.toString.replace("-","")}"
+    val systemName = s"pingpong${randomUUID}"
     system = ActorSystem(systemName, AkkaConfig.actorLoggingConf)
 
     def ppActor(matcher: String, answer: String) = Props(
@@ -30,10 +30,7 @@ class PingPong {
     val pinger = system.actorOf(ppActor("pong", "ping"))
 
     system.scheduler.scheduleOnce(100 millis){
-      ActorLogger.lastLogger.map{x =>
-        println("last logger is "+x.path)
-        x ! ActorLogger.SetTargetActor(ref)
-      }
+      ActorLogger.lastLogger.map(_ ! ActorLogger.SetTargetActor(ref))
 
       pinger.!("pong")(ponger)
     }

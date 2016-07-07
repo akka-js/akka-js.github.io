@@ -9,6 +9,8 @@ import org.scalajs.dom.document.{getElementById => getElem}
 import scalatags.JsDom._
 import scalatags.JsDom.all._
 
+import org.scalajs.dom.ext.Ajax
+
 import java.util.UUID.randomUUID
 
 object Page extends js.JSApp {
@@ -16,8 +18,8 @@ object Page extends js.JSApp {
     val system = ActorSystem("akkasite", AkkaConfig.config)
 
     val panels = List(
-      {s: String => Props(PingPongPanel(s))},
-      {s: String => Props(PingPongPanel(s))}
+      {s: String => Props(PingPongPanel(s))}/*,
+      {s: String => Props(PingPongPanel(s))}*/
     )
 
     import system.dispatcher
@@ -92,16 +94,19 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
 
   val modalId = randomUUID.toString
 
+  val prefix_url = "https://api.github.com/repos/andreaTP/akka.js-site/contents/src/main/scala/eu/unicredit/"
+
   val modal =
     div(id := modalId, cls := "modal fade", "role".attr := "dialog")(
       div(cls := "modal-dialog")(
         div(cls := "modal-content")(
           div(cls := "modal-header")(
-            h4(cls := "modal-title")(s"$title source"),
-            button(`type` :="button", cls := "close", "aria-hidden".attr :="true", "data-dismiss".attr := "modal")("×")
+            h4(cls := "modal-title")(s"$title source")
           ),
           div(cls := "modal-body")(
-            p(s"fetch the source from somthing like $source_url")
+            pre(style := "background-color: black")(
+              code(id := s"code$modalId", cls := "scala hljs")()
+            )
           ),
           div(cls := "modal-footer")(
             button(`type` := "button", cls := "close", "aria-hidden".attr :="true", "data-dismiss".attr := "modal")("Close")
@@ -123,12 +128,28 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
         div(cls := "panel-body")(content)
       )
     )
+
+  def loadSource() = {
+    import context.dispatcher
+    println("calling \n "+s"$prefix_url$source_url")
+    Ajax.get(s"$prefix_url$source_url",
+      timeout = 2000
+    ).map(req => {
+      val json = js.JSON.parse(req.responseText)
+
+      val source = js.Dynamic.global.atob(json.content)
+
+      getElem(s"code$modalId").innerHTML =
+        js.Dynamic.global.hljs.highlight("scala", source).value.toString
+    })
+  }
+
 }
 
 case class PingPongPanel(col_style: String) extends
     Panel(
       "Ping Pong",
-      "https://raw.githubusercontent.com/andreaTP/akka.js-site/master/src/main/scala/eu/unicredit/PingPong.scala",
+      "PingPong.scala",
       col_style
     ) {
 
@@ -149,6 +170,7 @@ case class PingPongPanel(col_style: String) extends
   case object Stop
 
   override def operative = {
+    loadSource()
     running(new PingPong, context.actorOf(Props(LogActor(loggerId, 10, 100))))
   }
 
