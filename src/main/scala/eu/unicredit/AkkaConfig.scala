@@ -4,16 +4,19 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 object AkkaConfig {
 
+
+  //TODO cleanup
   def base(logger: String) = s"""
 akka {
   home = ""
   version = "2.4-SNAPSHOT"
+  time-unit = "seconds"
   loggers = ["$logger"]
   logging-filter = "akka.event.JSDefaultLoggingFilter"
   #logging-filter = "akka.event.DefaultLoggingFilter"
   loggers-dispatcher = "akka.actor.default-dispatcher"
   logger-startup-timeout = 5s
-  loglevel = "INFO"
+  loglevel = "DEBUG"
   stdout-loglevel = "DEBUG"
   log-config-on-start = off
   log-dead-letters = 0
@@ -23,17 +26,108 @@ akka {
   daemonic = off
   jvm-exit-on-fatal-error = on
 
+
+  stream {
+
+    # Default flow materializer settings
+    materializer {
+
+      # Initial size of buffers used in stream elements
+      initial-input-buffer-size = 4
+      # Maximum size of buffers used in stream elements
+      max-input-buffer-size = 16
+
+      # Fully qualified config path which holds the dispatcher configuration
+      # to be used by FlowMaterialiser when creating Actors.
+      # When this value is left empty, the default-dispatcher will be used.
+      dispatcher = ""
+
+      # Cleanup leaked publishers and subscribers when they are not used within a given
+      # deadline
+      subscription-timeout {
+        # when the subscription timeout is reached one of the following strategies on
+        # the "stale" publisher:
+        # cancel - cancel it (via `onError` or subscribing to the publisher and
+        #          `cancel()`ing the subscription right away
+        # warn   - log a warning statement about the stale element (then drop the
+        #          reference to it)
+        # noop   - do nothing (not recommended)
+        mode = cancel
+
+        # time after which a subscriber / publisher is considered stale and eligible
+        # for cancelation (see `akka.stream.subscription-timeout.mode`)
+        timeout = 5s
+      }
+
+      # Enable additional troubleshooting logging at DEBUG log level
+      debug-logging = on
+
+      # Maximum number of elements emitted in batch if downstream signals large demand
+      output-burst-limit = 1000
+
+      # Enable automatic fusing of all graphs that are run. For short-lived streams
+      # this may cause an initial runtime overhead, but most of the time fusing is
+      # desirable since it reduces the number of Actors that are created.
+      auto-fusing = on
+
+      # Those stream elements which have explicit buffers (like mapAsync, mapAsyncUnordered,
+      # buffer, flatMapMerge, Source.actorRef, Source.queue, etc.) will preallocate a fixed
+      # buffer upon stream materialization if the requested buffer size is less than this
+      # configuration parameter. The default is very high because failing early is better
+      # than failing under load.
+      #
+      # Buffers sized larger than this will dynamically grow/shrink and consume more memory
+      # per element than the fixed size buffers.
+      max-fixed-buffer-size = 1000000000
+
+      # Maximum number of sync messages that actor can process for stream to substream communication.
+      # Parameter allows to interrupt synchronous processing to get upsteam/downstream messages.
+      # Allows to accelerate message processing that happening withing same actor but keep system responsive.
+      sync-processing-limit = 1000
+
+      debug {
+        # Enables the fuzzing mode which increases the chance of race conditions
+        # by aggressively reordering events and making certain operations more
+        # concurrent than usual.
+        # This setting is for testing purposes, NEVER enable this in a production
+        # environment!
+        # To get the best results, try combining this setting with a throughput
+        # of 1 on the corresponding dispatchers.
+        fuzzing-mode = off
+      }
+    }
+
+    # Fully qualified config path which holds the dispatcher configuration
+    # to be used by FlowMaterialiser when creating Actors for IO operations,
+    # such as FileSource, FileSink and others.
+    blocking-io-dispatcher = "akka.stream.default-blocking-io-dispatcher"
+
+    default-blocking-io-dispatcher {
+      type = "Dispatcher"
+      executor = "thread-pool-executor"
+      throughput = 1
+
+      thread-pool-executor {
+        core-pool-size-min = 2
+        core-pool-size-factor = 2.0
+        core-pool-size-max = 16
+      }
+    }
+  }
+
+
   actor {
     #provider = "akka.actor.LocalActorRefProvider"
     provider = "akka.actor.JSLocalActorRefProvider"
     guardian-supervisor-strategy = "akka.actor.DefaultSupervisorStrategy"
-    creation-timeout = 20s
+    creation-timeout = 20
+    timeout = 5
     serialize-messages = off
     serialize-creators = off
-    unstarted-push-timeout = 10s
+    unstarted-push-timeout = 10
     typed {
       # Default timeout for typed actor methods with non-void return type
-      timeout = 5s
+      timeout = n
     }
     router.type-mapping {
       from-code = "akka.routing.NoRouter"
@@ -175,13 +269,13 @@ akka {
       }
     }
     debug {
-      receive = off
-      autoreceive = off
-      lifecycle = off
-      fsm = off
-      event-stream = off
-      unhandled = off
-      router-misconfiguration = off
+      receive = on
+      autoreceive = on
+      lifecycle = on
+      fsm = on
+      event-stream = on
+      unhandled = on
+      router-misconfiguration = on
     }
     serializers {
       java = "akka.serialization.JavaSerializer"
@@ -207,49 +301,6 @@ akka {
     #implementation = akka.actor.LightArrayRevolverScheduler
     implementation = akka.actor.EventLoopScheduler
     shutdown-timeout = 5s
-  }
-
-stream {
-    materializer {
-
-      initial-input-buffer-size = 4
-      max-input-buffer-size = 16
-
-      dispatcher = ""
-
-      subscription-timeout {
-        mode = cancel
-
-        timeout = 5s
-      }
-
-      debug-logging = on
-
-      output-burst-limit = 1000
-
-      auto-fusing = on
-
-      max-fixed-buffer-size = 1000000000
-
-      sync-processing-limit = 1000
-
-      debug {
-        fuzzing-mode = off
-      }
-    }
-    blocking-io-dispatcher = "akka.stream.default-blocking-io-dispatcher"
-
-    default-blocking-io-dispatcher {
-      type = "Dispatcher"
-      executor = "thread-pool-executor"
-      throughput = 1
-
-      thread-pool-executor {
-        core-pool-size-min = 2
-        core-pool-size-factor = 2.0
-        core-pool-size-max = 16
-      }
-    }
   }
 }
 """

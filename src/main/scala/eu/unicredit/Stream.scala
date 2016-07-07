@@ -18,7 +18,7 @@ class Stream {
 
   def start(ref: ActorRef) = {
     val systemName = s"stream${randomUUID}"
-    system = ActorSystem(systemName, AkkaConfig.config/*actorLoggingConf*/)
+    system = ActorSystem(systemName, AkkaConfig.actorLoggingConf)
 
     implicit val actorSystem = system
     implicit val dispatcher = system.dispatcher
@@ -41,8 +41,8 @@ class Stream {
           ea: String => system.log.info(s"sink: ${ea}")
         })
 
-    system.scheduler.scheduleOnce(100 millis){
-      //ActorLogger.lastLogger.map(_ ! SetTargetActor(ref))
+    system.scheduler.scheduleOnce(200 millis){
+      ActorLogger.lastLogger.map(_ ! SetTargetActor(ref))
 
       flow.runWith(strings)
     }

@@ -173,7 +173,7 @@ case class PingPongPanel(col_style: String) extends
 
   override def operative = {
     loadSource()
-    running(new PingPong, context.actorOf(Props(LogActor(loggerId, 10, 100))))
+    running(new PingPong, context.actorOf(Props(LogActor(loggerId, 10, 100, (for (_ <- 0 until 100) yield "").toList))))
   }
 
   def running(pp: PingPong, logger: ActorRef): Receive = domManagement orElse {
@@ -189,11 +189,10 @@ case class PingPongPanel(col_style: String) extends
 case class LogMsg(txt: String)
 case object ResetLog
 
-case class LogActor(hook: String, showLines: Int, maxLines: Int) extends DomActorWithParams[List[String]] {
+case class LogActor(hook: String, showLines: Int, maxLines: Int, init: List[String]) extends DomActorWithParams[List[String]] {
   override val domElement = Some(getElem(hook))
 
-  val initValue: List[String] =
-    (for (_ <- 0 until maxLines) yield "").toList
+  val initValue: List[String] = init
 
   def template(txt: List[String]) =
     textarea(cls := "form-control", "rows".attr := s"$showLines", "readonly".attr := "readonly", style := "style=font-family: monospace;font-size: 70%")(
@@ -265,7 +264,7 @@ case class StreamPanel(col_style: String) extends
 
   override def operative = {
     loadSource()
-    running(new Stream, context.actorOf(Props(LogActor(loggerId, 10, 10))))
+    running(new Stream, context.actorOf(Props(LogActor(loggerId, 20, 20, List()))))
   }
 
   def running(stream: Stream, logger: ActorRef): Receive = domManagement orElse {
