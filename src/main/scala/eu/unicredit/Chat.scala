@@ -67,45 +67,49 @@ case class ChatBox(wsUrl: String) extends DomActorWithParams[List[String]] {
 
   val initValue = List()
 
-  val msgBox = input("placeholder".attr := "enter message").render
+  val msgBox =
+    input("placeholder".attr := "enter message",
+      `type` := "text",
+      cls := "form-control",
+      onkeydown := {(event: js.Dynamic) =>
+        if(event.keyCode == 13) {
+          event.preventDefault()
+          sendMsg()
+        }
+      }
+    ).render
+
+  val sendMsg: () => Unit = () => ws.send(msgBox.value)
 
   def template(txt: List[String]) =
     div(cls := "row")(
       div(cls := "col-md-1"),
-      div(cls := "col-md-11")(
-        div(cls := "container")(
-          div(cls := "row")(
-            b(s"connected: $wsUrl")
-          ),
-          div(cls := "row")(
-            div(cls := "input-group")(
-              msgBox,
-              span(cls := "input-group-btn")(
-                button(
-                  `type` := "button",
-                  cls := "btn btn-default",
-                  onclick := {() => ws.send(msgBox.value)})("Send")
-              )
-            )
-          ),
-          div(cls := "row")(
-            ul()(
-              for (t <- txt) yield li()(t)
-            )
-          ),
-          div(cls := "row")(
-            div(cls := "input-group")(
-              span(cls := "input-group-btn")(
-                button(
-                  `type` := "button",
-                  cls := "btn btn-default",
-                  onclick := {() => self ! PoisonPill})("Close")
-              )
-            )
+      div(cls := "col-md-10")(
+        b(s"connected to: $wsUrl"),
+        div(cls := "input-group")(
+          msgBox,
+          span(cls := "input-group-btn")(
+            button(
+              `type` := "button",
+              cls := "btn btn-default",
+              onclick := sendMsg
+            )("Send")
+          )
+        ),
+        ul()(
+          for (t <- txt) yield li()(t)
+        ),
+        div(cls := "input-group")(
+          span(cls := "input-group-btn")(
+            button(
+              `type` := "button",
+              cls := "btn btn-default",
+              onclick := {() => self ! PoisonPill})("Close")
           )
         ),
         hr()
-      )
+      ),
+      div(cls := "col-md-1")
     )
 
   override def operative = withText(initValue)

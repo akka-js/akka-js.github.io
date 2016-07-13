@@ -349,7 +349,10 @@ case class ChatPanel(col_style: String) extends
         br(),
         "For example you can generate a server on HyperDev by clicking ",
         a(href := "https://hyperdev.com/#!/import/github/andreaTP/akka.js-chat-backend", "target".attr := "_blank")("here "),
-        " then click on 'Show live', do not care the output and copy the url where you have been redirected; insert it below a couple of times and start chatting with yourself."
+        " then click on 'Show live', do not care the output and copy the url where you have been redirected; insert it below a couple of times and start chatting with yourself.",
+        "Source of the deployed server are available ",
+        a(href := "https://github.com/andreaTP/akka.js-chat-backend")("here"),
+        "."
       ),
       div(id := chatId, cls := "container")
     )
