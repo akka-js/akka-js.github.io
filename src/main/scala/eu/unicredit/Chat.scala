@@ -62,7 +62,7 @@ case class ChatBox(wsUrl: String) extends DomActorWithParams[List[String]] {
 
   case class NewMsg(txt: String)
 
-  val ws = new WebSocket(s"ws://$wsUrl")
+  val ws = new WebSocket(s"wss://$wsUrl")
   ws.onmessage = { (event: MessageEvent) => self ! NewMsg(event.data.toString)}
 
   val initValue = List()
