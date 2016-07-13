@@ -21,7 +21,8 @@ object Page extends js.JSApp {
       {s: String => Props(PingPongPanel(s))},
       {s: String => Props(ToDoPanel(s))},
       {s: String => Props(StreamPanel(s))},
-      {s: String => Props(ThisPagePanel(s))}
+      {s: String => Props(ThisPagePanel(s))},
+      {s: String => Props(ChatPanel(s))}
     )
 
     import system.dispatcher
@@ -112,9 +113,9 @@ case class RowActor(left: Option[(String) => Props], right: Option[(String) => P
         context.actorOf(l("col-md-6"))
         context.actorOf(r("col-md-6"))
       case (Some(l), _) =>
-        context.actorOf(l("col-md-12"))
+        context.actorOf(l("col-md-6"))//"col-md-12"))
       case (_, Some(r)) =>
-        context.actorOf(r("col-md-12"))
+        context.actorOf(r("col-md-6"))//"col-md-12"))
       case _ =>
     }
 
@@ -328,6 +329,36 @@ case class ThisPagePanel(col_style: String) extends
 
   override def operative = {
     loadSource()
+    super.operative
+  }
+}
+
+case class ChatPanel(col_style: String) extends
+    Panel(
+      "Chat",
+      "Chat.scala",
+      col_style
+    ) {
+
+  val chatId = randomUUID.toString
+
+  def content =
+    div(
+      p(cls := "alert alert-info")(
+        "This is a demo chat backed by a server generated for Node with Akka.Js itself.",
+        br(),
+        "For example you can generate a server on HyperDev by clicking ",
+        a(href := "https://hyperdev.com/#!/import/github/andreaTP/akka.js-chat-backend", "target".attr := "_blank")("here "),
+        " then click on 'Show live', do not care the output and copy the url where you have been redirected; insert it below a couple of times and start chatting with yourself."
+      ),
+      div(id := chatId, cls := "container")
+    )
+
+  override def operative = {
+    loadSource()
+
+    context.actorOf(Props(Chat(chatId)))
+
     super.operative
   }
 }
