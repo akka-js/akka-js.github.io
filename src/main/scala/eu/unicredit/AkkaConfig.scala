@@ -13,7 +13,7 @@ object AkkaConfig {
       # Initial size of buffers used in stream elements
       initial-input-buffer-size = 4
       # Maximum size of buffers used in stream elements
-      max-input-buffer-size = 16
+      max-input-buffer-size = 256
 
       # Fully qualified config path which holds the dispatcher configuration
       # to be used by FlowMaterialiser when creating Actors.
@@ -212,7 +212,7 @@ akka {
         allow-core-timeout = on
       }
       shutdown-timeout = 1s
-      throughput = 5
+      throughput = 256
       throughput-deadline-time = 0ms
       attempt-teamwork = on
       mailbox-requirement = ""

@@ -21,8 +21,8 @@ object Page extends js.JSApp {
       {s: String => Props(PingPongPanel(s))},
       {s: String => Props(ToDoPanel(s))},
       {s: String => Props(StreamPanel(s))},
-      {s: String => Props(ThisPagePanel(s))},
-      {s: String => Props(ChatPanel(s))}
+      {s: String => Props(ChatPanel(s))},
+      {s: String => Props(ThisPagePanel(s))}
     )
 
     import system.dispatcher
@@ -287,26 +287,39 @@ case class StreamPanel(col_style: String) extends
   def content =
     div(
       p(cls := "alert alert-info")(
-        "Here is an Akka-Stream.js basic example, where a factorial flow will run."
+        "Here there are Akka-Stream.Js basic examples, where you can run a factorial flow or approximate pi from random doubles."
       ),
-      button(`type` :="button", cls :="btn btn-success alert col-md-2", onclick := {() => self ! Start})("Start"),
+      div(cls :="col-md-2")(
+        button(`type` :="button", cls :="btn btn-success alert", onclick := {() => self ! StartFactorial})("Factorial")
+      ),
       div(cls :="col-md-1"),
-      button(`type` :="button", cls :="btn btn-danger alert col-md-2", onclick := {() => self ! Stop})("Stop"),
+      div(cls :="col-md-2")(
+        button(`type` :="button", cls :="btn btn-success alert", onclick := {() => self ! StartPi})("Pi")
+      ),
+      div(cls :="col-md-1"),
+      div(cls :="col-md-2")(
+        button(`type` :="button", cls :="btn btn-danger alert", onclick := {() => self ! Stop})("Stop")
+      ),
       div(id := loggerId)
     )
 
-  case object Start
+  case object StartFactorial
+  case object StartPi
   case object Stop
 
   override def operative = {
     loadSource()
-    running(new Stream, context.actorOf(Props(LogActor(loggerId, 20, 20, List()))))
+    running(new Stream, context.actorOf(Props(LogActor(loggerId, 20, 10, List()))))
   }
 
   def running(stream: Stream, logger: ActorRef): Receive = domManagement orElse {
-    case Start =>
+    case StartFactorial =>
       stream.stop()
-      stream.start(logger)
+      stream.start(logger, FlowType.Factorial)
+      logger ! ResetLog
+    case StartPi =>
+      stream.stop()
+      stream.start(logger, FlowType.Pi)
       logger ! ResetLog
     case Stop =>
       stream.stop()
