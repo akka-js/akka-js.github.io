@@ -369,7 +369,8 @@ case class ChatPanel(col_style: String) extends
         " do not care the output and copy the url where you have been redirected; insert it below a couple of times and start chatting with yourself.",
         " Source of the deployed server are available ",
         a(href := "https://github.com/andreaTP/akka.js-chat-backend")("here"),
-        "."
+        ".",
+        "Unfortunately HyperDev is not so stable at the moment, if this doesn't work please come back and rety!"
       ),
       div(id := chatId, cls := "container")
     )
