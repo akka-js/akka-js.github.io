@@ -14,7 +14,7 @@ case class ToDo(hook: String) extends DomActor {
   override val domElement = Some(getElem(hook))
 
   val inputBox =
-    input("placeholder".attr := "what to do?",
+    input(attr("placeholder") := "what to do?",
           `type` := "text",
           cls := "form-control",
           onkeydown := {(event: js.Dynamic) =>

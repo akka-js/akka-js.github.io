@@ -132,7 +132,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
   val prefix_url = "https://api.github.com/repos/andreaTP/akka.js-site/contents/src/main/scala/eu/unicredit/"
 
   val modal =
-    div(id := modalId, cls := "modal fade large", "role".attr := "dialog")(
+    div(id := modalId, cls := "modal fade large", attr("role") := "dialog")(
       div(cls := "modal-dialog")(
         div(cls := "modal-content")(
           div(cls := "modal-header")(
@@ -144,7 +144,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
             )
           ),
           div(cls := "modal-footer")(
-            button(`type` := "button", cls := "close", "aria-hidden".attr :="true", "data-dismiss".attr := "modal")("Close")
+            button(`type` := "button", cls := "close", attr("aria-hidden") :="true", attr("data-dismiss") := "modal")("Close")
           )
         )
       )
@@ -156,7 +156,7 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
         div(cls := "panel-heading")(
           h2(cls := "panel-title")(title,
             span(cls := "links pull-right", style := "cursor:pointer")(
-              a("data-toggle".attr :="modal", "data-target".attr :=s"#$modalId")("Source")
+              a(attr("data-toggle") :="modal", attr("data-target") :=s"#$modalId")("Source")
             )
           )
         ),
@@ -230,7 +230,7 @@ case class LogActor(hook: String, showLines: Int, maxLines: Int, init: List[Stri
   val initValue: List[String] = init
 
   def template(txt: List[String]) =
-    textarea(cls := "form-control", "rows".attr := s"$showLines", "readonly".attr := "readonly", style := "style=font-family: monospace;font-size: 70%")(
+    textarea(cls := "form-control", attr("rows") := s"$showLines", attr("readonly") := "readonly", style := "style=font-family: monospace;font-size: 70%")(
       txt.mkString("\n")
     )
 
@@ -362,7 +362,7 @@ case class ChatPanel(col_style: String) extends
         br(),
         "For example you can generate a server on HyperDev by clicking ",
         b(
-          a(href := "https://hyperdev.com/#!/import/github/andreaTP/akka.js-chat-backend", "target".attr := "_blank")("here ")
+          a(href := "https://hyperdev.com/#!/import/github/andreaTP/akka.js-chat-backend", attr("target") := "_blank")("here ")
         ),
         " then click on ",
         b("'Show live'"),

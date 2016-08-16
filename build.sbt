@@ -11,9 +11,9 @@ scalacOptions := Seq("-feature", "-language:_", "-deprecation")
 //resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "eu.unicredit" %%% "akkajsactorstream" % "0.1.2-SNAPSHOT",
-  "eu.unicredit" %%% "akkajsactor" % "0.1.2-SNAPSHOT",
-  "com.lihaoyi" %%% "scalatags" % "0.5.4"
+  "eu.unicredit" %%% "akkajsactorstream" % "0.2.0",
+  "eu.unicredit" %%% "akkajsactor" % "0.2.0",
+  "com.lihaoyi" %%% "scalatags" % "0.6.0"
 )
 
 persistLauncher in Compile := true

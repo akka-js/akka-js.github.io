@@ -15,7 +15,7 @@ case class Chat(hook: String) extends DomActor {
   override val domElement = Some(getElem(hook))
 
   val urlBox =
-    input("placeholder".attr := "enter url here",
+    input(attr("placeholder") := "enter url here",
           `type` := "text",
           cls := "form-control",
           onkeydown := {(event: js.Dynamic) =>
@@ -68,7 +68,7 @@ case class ChatBox(wsUrl: String) extends DomActorWithParams[List[String]] {
   val initValue = List()
 
   val msgBox =
-    input("placeholder".attr := "enter message",
+    input(attr("placeholder") := "enter message",
       `type` := "text",
       cls := "form-control",
       onkeydown := {(event: js.Dynamic) =>
