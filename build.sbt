@@ -8,7 +8,7 @@ scalaVersion  := "2.11.8"
 
 scalacOptions := Seq("-feature", "-language:_", "-deprecation")
 
-//resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("releases")
 
 libraryDependencies ++= Seq(
   "eu.unicredit" %%% "akkajsactorstream" % "0.2.0",
