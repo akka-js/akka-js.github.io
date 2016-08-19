@@ -132,7 +132,6 @@ trait DomActor extends Actor {
 }
 
   // $FiddleStart
-
 case class NewElem(txt: String)
 
 case class Page() extends DomActor {
@@ -154,7 +153,7 @@ case class Page() extends DomActor {
     context.actorOf(Props(ToDoList()))
 
     def template() = div(
-        h3(style := "margin: 0px;")("ToDo:"),
+        h2(style := "margin: 10px;")("ToDo:"),
         inputBox
       )
 }
@@ -205,6 +204,8 @@ import akka.util.Timeout
 import scala.util.Try
 import scala.concurrent.Future
 import scala.concurrent.duration._
+
+// $FiddleDependency eu.unicredit %%% akkajsactorstream % 0.2.0
 
 // simple XORshift* random number generator (see, e.g., http://en.wikipedia.org/wiki/Xorshift)
 class RandomLongValueGenerator(seed: Long = 182642182642182642L) extends Iterator[Long] {
