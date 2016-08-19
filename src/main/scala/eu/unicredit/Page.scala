@@ -123,24 +123,29 @@ case class RowActor(left: Option[(String) => Props], right: Option[(String) => P
   }
 }
 
-abstract class Panel(title: String, source_url: String, col_style: String) extends DomActor {
+abstract class Panel(
+    title: String,
+    source_url: String,
+    col_style: String,
+    fiddleCode: Option[String] = None)
+  extends DomActor {
 
   def content: TypedTag[_ <: org.scalajs.dom.raw.Element]
 
-  val modalId = randomUUID.toString
+  val sourceId = randomUUID.toString
 
   val prefix_url = "https://api.github.com/repos/andreaTP/akka.js-site/contents/src/main/scala/eu/unicredit/"
 
-  val modal =
-    div(id := modalId, cls := "modal fade large", attr("role") := "dialog")(
+  val source =
+    div(id := sourceId, cls := "modal fade large", attr("role") := "dialog")(
       div(cls := "modal-dialog")(
         div(cls := "modal-content")(
           div(cls := "modal-header")(
             h4(cls := "modal-title")(s"$title source code:")
           ),
-          div(cls := "modal-body")(
+          div(cls := "modal-body", height := "300%")(
             pre(style := "background-color: black")(
-              code(id := s"code$modalId", cls := "scala hljs")()
+              code(id := s"code$sourceId", cls := "scala hljs")()
             )
           ),
           div(cls := "modal-footer")(
@@ -150,17 +155,53 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
       )
     )
 
+  val fiddleId = randomUUID.toString
+
+  val fiddle =
+    if (fiddleCode.isDefined)
+    div(id := fiddleId, cls := "modal fade large", attr("role") := "dialog")(
+      div(cls := "modal-dialog")(
+        div(cls := "modal-content")(
+          div(cls := "modal-header")(
+            h4(cls := "modal-title")(s"$title fiddle:")
+          ),
+          div(cls := "modal-body", height := "300%")(
+            iframe(
+              src := s"https://embed.scalafiddle.io/embed?layout=v75&source=${fiddleCode.get}",
+              attr("frameborder") := "0",
+              style := "width: 100%; height: 600px; overflow: hidden;"
+            )
+          ),
+          div(cls := "modal-footer")(
+            button(`type` := "button", cls := "close", attr("aria-hidden") :="true", attr("data-dismiss") := "modal")("Close")
+          )
+        )
+      )
+    )
+    else div()
+
   override def template =
     div(cls := col_style)(
       div(cls := "panel panel-default")(
         div(cls := "panel-heading")(
           h2(cls := "panel-title")(title,
             span(cls := "links pull-right", style := "cursor:pointer")(
-              a(attr("data-toggle") :="modal", attr("data-target") :=s"#$modalId")("Source")
+              Seq(
+                a(attr("data-toggle") :="modal", attr("data-target") := s"#$sourceId")("Source")
+              ) ++
+              {
+                if (fiddleCode.isDefined) {
+                  Seq(
+                    span(" | "),
+                    a(attr("data-toggle") :="modal", attr("data-target") := s"#$fiddleId")("Fiddle")
+                  )
+                } else Seq()
+              }
             )
           )
         ),
-        modal,
+        source,
+        fiddle,
         div(cls := "panel-body")(content)
       )
     )
@@ -174,10 +215,10 @@ abstract class Panel(title: String, source_url: String, col_style: String) exten
 
       val source = js.Dynamic.global.atob(json.content)
 
-      getElem(s"code$modalId").innerHTML =
+      getElem(s"code$sourceId").innerHTML =
         js.Dynamic.global.hljs.highlight("scala", source).value.toString
     }).recover{
-      case _ => getElem(s"code$modalId").innerHTML = "source not found"
+      case _ => getElem(s"code$sourceId").innerHTML = "source not found"
     }
   }
 
@@ -187,7 +228,8 @@ case class PingPongPanel(col_style: String) extends
     Panel(
       "Ping Pong",
       "PingPong.scala",
-      col_style
+      col_style,
+      Some(Fiddles.pingpong)
     ) {
 
   val loggerId = randomUUID.toString
@@ -253,7 +295,8 @@ case class ToDoPanel(col_style: String) extends
     Panel(
       "To Do",
       "ToDo.scala",
-      col_style
+      col_style,
+      Some(Fiddles.todo)
     ) {
 
   val todoId = randomUUID.toString
@@ -279,7 +322,8 @@ case class StreamPanel(col_style: String) extends
     Panel(
       "Stream",
       "Stream.scala",
-      col_style
+      col_style,
+      Some(Fiddles.streams)
     ) {
 
   val loggerId = randomUUID.toString
