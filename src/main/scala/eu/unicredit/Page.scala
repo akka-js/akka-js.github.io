@@ -67,7 +67,7 @@ case class Note() extends DomActor {
       div(cls := "col-md-12")(
         p(cls := "alert alert-success")(
           "The complete source code of this page is available ",
-          a(href := "https://github.com/andreaTP/akka.js-site")(" here"),
+          a(href := "https://github.com/akka-js/akka.js-site")(" here"),
           "."
         )
       )
@@ -134,7 +134,7 @@ abstract class Panel(
 
   val sourceId = randomUUID.toString
 
-  val prefix_url = "https://api.github.com/repos/andreaTP/akka.js-site/contents/src/main/scala/eu/unicredit/"
+  val prefix_url = "https://api.github.com/repos/akka-js/akka.js-site/contents/src/main/scala/eu/unicredit/"
 
   val source =
     div(id := sourceId, cls := "modal fade large", attr("role") := "dialog")(
