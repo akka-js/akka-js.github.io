@@ -134,7 +134,7 @@ abstract class Panel(
 
   val sourceId = randomUUID.toString
 
-  val prefix_url = "https://api.github.com/repos/akka-js/akka.js-site/contents/src/main/scala/eu/unicredit/"
+  val prefix_url = "https://api.github.com/repos/akka-js/akka-js.github.io/contents/src/main/scala/eu/unicredit/"
 
   val source =
     div(id := sourceId, cls := "modal fade large", attr("role") := "dialog")(
@@ -208,7 +208,7 @@ abstract class Panel(
 
   def loadSource() = {
     import context.dispatcher
-    Ajax.get(s"$prefix_url$source_url",
+    Ajax.get(s"$prefix_url$source_url?ref=code",
       timeout = 3000
     ).map(req => {
       val json = js.JSON.parse(req.responseText)
