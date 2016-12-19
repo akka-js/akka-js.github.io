@@ -67,7 +67,7 @@ case class Note() extends DomActor {
       div(cls := "col-md-12")(
         p(cls := "alert alert-success")(
           "The complete source code of this page is available ",
-          a(href := "https://github.com/akka-js/akka.js-site")(" here"),
+          a(href := "https://github.com/akka-js/akka-js.github.io/tree/code")(" here"),
           "."
         )
       )
@@ -94,8 +94,8 @@ case class LogoActor() extends DomActor {
     div(cls := "row")(
       div(cls := "col-md-3")(),
       div(cls := "col-md-6")(
-        a(href := "https://github.com/unicredit/akka.js")(
-          img(cls := "img-responsive", src := "https://raw.githubusercontent.com/unicredit/akka.js/merge-js/logo/akkajs.png")
+        a(href := "https://github.com/akka-js/akka.js")(
+          img(cls := "img-responsive", src := "https://raw.githubusercontent.com/akka-js/akka.js/merge-js/logo/akkajs.png")
         ),
         h3(cls := "text-center")("Enjoy Akka in Scala.Js!")
       ),
