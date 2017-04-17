@@ -98,7 +98,7 @@ object AkkaConfig {
   def base(logger: String, stream: String = "") = s"""
 akka {
   home = ""
-  version = "2.4-SNAPSHOT"
+  version = "2.5-SNAPSHOT"
   time-unit = "seconds"
   loggers = ["$logger"]
   logging-filter = "akka.event.JSDefaultLoggingFilter"
@@ -316,16 +316,10 @@ akka {
 
   val config: Config = ConfigFactory.parseString(default)
 
-  val actorLoggingConf: Config = {
-    ActorLogger.loadLoggerClass()
-
+  val actorLoggingConf: Config =
     ConfigFactory.parseString(actorLogging)
-  }
 
-  val actorStreamLoggingConf: Config = {
-    ActorLogger.loadLoggerClass()
-
+  val actorStreamLoggingConf: Config =
     ConfigFactory.parseString(actorStreamLogging)
-  }
 
 }

@@ -8,17 +8,11 @@ import scala.scalajs.js.annotation.JSExport
 
 object ActorLogger {
 
-  def loadLoggerClass() =
-    akka.actor.JSDynamicAccess.injectClass(
-      "eu.unicredit.ActorLogger" -> classOf[eu.unicredit.ActorLogger]
-    )
-
   case class SetTargetActor(ref: ActorRef)
 
   var lastLogger: Option[ActorRef] = None
 }
 
-@JSExport
 class ActorLogger extends JSDefaultLogger() {
 
   ActorLogger.lastLogger = Some(self)

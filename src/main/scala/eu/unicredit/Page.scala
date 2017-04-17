@@ -21,7 +21,6 @@ object Page extends js.JSApp {
       {s: String => Props(PingPongPanel(s))},
       {s: String => Props(ToDoPanel(s))},
       {s: String => Props(StreamPanel(s))},
-      {s: String => Props(ChatPanel(s))},
       {s: String => Props(ThisPagePanel(s))}
     )
 
@@ -386,44 +385,6 @@ case class ThisPagePanel(col_style: String) extends
 
   override def operative = {
     loadSource()
-    super.operative
-  }
-}
-
-case class ChatPanel(col_style: String) extends
-    Panel(
-      "Chat",
-      "Chat.scala",
-      col_style
-    ) {
-
-  val chatId = randomUUID.toString
-
-  def content =
-    div(
-      p(cls := "alert alert-info")(
-        "This is a demo chat backed by a server generated for Node with Akka.Js itself.",
-        br(),
-        "For example you can generate a server on HyperDev by clicking ",
-        b(
-          a(href := "https://hyperdev.com/#!/import/github/andreaTP/akka.js-chat-backend", attr("target") := "_blank")("here ")
-        ),
-        " then click on ",
-        b("'Show live'"),
-        " do not care the output and copy the url where you have been redirected; insert it below a couple of times and start chatting with yourself.",
-        " Source of the deployed server are available ",
-        a(href := "https://github.com/andreaTP/akka.js-chat-backend")("here"),
-        ".",
-        "Unfortunately HyperDev is not so stable at the moment, if this doesn't work please come back and retry!"
-      ),
-      div(id := chatId, cls := "container")
-    )
-
-  override def operative = {
-    loadSource()
-
-    context.actorOf(Props(Chat(chatId)))
-
     super.operative
   }
 }
